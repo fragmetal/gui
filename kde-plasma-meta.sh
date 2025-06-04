@@ -22,8 +22,9 @@ sudo pacman -Syu --needed --noconfirm \
 xinitrc_file="$HOME/.xinitrc"
 log_file="$HOME/.xinitrc.log"
 
-# Create robust .xinitrc
+# Create robust .xinitrc - CORRECTED WITH SHEBANG
 cat > "$xinitrc_file" << 'EOF'
+#!/bin/sh
 
 # Log session output
 exec > "$HOME/.xinitrc.log" 2>&1
@@ -64,25 +65,3 @@ read -r answer
 if [[ "$answer" =~ ^[Yy] ]]; then
     # Add to shell profile
     shell_profile="$HOME/.bash_profile"
-    [ -f "$HOME/.zprofile" ] && shell_profile="$HOME/.zprofile"
-    
-    if ! grep -qF "startx" "$shell_profile"; then
-        cat >> "$shell_profile" << 'EOF'
-
-# Auto-start Plasma on tty1
-if [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
-    sleep 1
-    exec startx
-fi
-EOF
-        echo "Auto-start configured for TTY1 in $shell_profile"
-    else
-        echo "Auto-start already configured in $shell_profile"
-    fi
-fi
-
-echo -e "\nInstallation complete! Next steps:"
-echo "1. REBOOT your system"
-echo "2. After reboot, Plasma should start automatically on TTY1"
-echo "3. If not, switch to TTY (Ctrl+Alt+F2) and run: startx"
-echo "4. Check logs if needed: less $log_file"
